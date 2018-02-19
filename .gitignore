@@ -74,3 +74,4 @@ fabric.properties
 *.xml
 .idea/workspace.xml
 .idea/workspace.xml
+*.xml
