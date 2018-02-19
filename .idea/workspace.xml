@@ -3,7 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="df951599-4a4a-4d4e-9ddf-0e52bb78dc20" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/src/Piece.java" afterPath="$PROJECT_DIR$/src/Piece.java" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -361,7 +360,14 @@
       <option name="project" value="LOCAL" />
       <updated>1519000130969</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="defined pieces">
+      <created>1519001120012</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1519001120012</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -401,7 +407,8 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="i hope this works" />
     <MESSAGE value="added 2d array for board" />
-    <option name="LAST_COMMIT_MESSAGE" value="added 2d array for board" />
+    <MESSAGE value="defined pieces" />
+    <option name="LAST_COMMIT_MESSAGE" value="defined pieces" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
