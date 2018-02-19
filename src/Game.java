@@ -1,17 +1,22 @@
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.MouseEvent;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Font;
 import java.awt.event.MouseListener;
-
+import java.awt.event.MouseEvent;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+/*
+ * What should be here:
+ * -8x8 array with board pieces
+ * -GUI
+ * -An interface to interact with the board
+ */
 public class Game extends JPanel implements MouseListener{
     private int[][] board;
-
-    /*
-     * What should be here:
-     * -8x8 array with board pieces
-     * -GUI
-     * -An interface to interact with the board
-     */
+    private JFrame frame = new JFrame();
+    final Color BG = Color.decode("#4D74B3");
+    final Color BLACK = Color.decode("#CCCCCC");
+    final Color WHITE = Color.decode("#111111");
     public Game() {
         board = new int[8][8];
         for(int i = 0; i < board.length; i++) {
@@ -19,26 +24,34 @@ public class Game extends JPanel implements MouseListener{
                 board[i][j] = 0;//0 = empty
             }
         }
-
+        repaint();
+        frame.setSize(800, 800);
+        frame.getContentPane().add(this);
+        frame.setLocationRelativeTo(null);
+        frame.setBackground(BG);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setResizable(true);
+        frame.setVisible(true);
     }
-
 
     public void paint(Graphics g){
+        g.setColor(BG);
         g.fillRect(100, 100, 400, 400);
-        for(int i = 100; i <= 500; i += 100){
-            for(int j = 100; j <= 500; j += 100){
-                g.clearRect(i, j, 50, 50);
+        int constraint = Math.min(frame.getWidth(),frame.getHeight());
+        int offset = constraint/10;
+        int side = constraint/10;
+        for(int i = 0; i < 8; i++){
+            for(int j = 0; j < 8; j++){
+                if((j+i)%2 == 1){
+                    g.setColor(WHITE);
+                    g.fillRect(j*side+offset, i*side+offset, side, side);
+                } else {
+                    g.setColor(BLACK);
+                    g.fillRect(j*side+offset, i*side+offset, side, side);
+                }
             }
         }
-
-        for(int i = 150; i <= 550; i += 100){
-            for(int j = 150; j <= 550; j += 100){
-                g.clearRect(i, j, 50, 50);
-            }
-        }
-        repaint();
     }
-
 
     @Override
     public void mouseClicked(MouseEvent e) {
