@@ -30,7 +30,7 @@ public class Game extends JPanel implements MouseListener{
         //keep in mind that i is y and j is x. easy to get those confused
         for(int i = 0; i < board.length; i++) {
             for(int j = 0; j < board.length; j++) {
-                board[i][j] = new Piece('_',i,j);//_ = empty
+                board[i][j] = new Piece('_',i,j); //_ = empty space
             }
         }
         repaint();
@@ -75,7 +75,7 @@ public class Game extends JPanel implements MouseListener{
             secondJ = (int)(Math.floor((double)(e.getX()-offset)/(double)side));
             secondI = (int)(Math.floor((double)(e.getY()-offset)/(double)side));
             if(!validSecond()){
-                secondJ = -1; //since invalid
+                secondJ = -1; //since it's invalid we are cancelling the move. whoops!
                 secondI = -1;
                 System.out.println("Invalid second");
                 firstJ = -1; //setting all this to 0 so that we'll know we're on first click again!
@@ -83,6 +83,9 @@ public class Game extends JPanel implements MouseListener{
                 repaint();
                 return;
             }
+            board[firstI][firstJ].setBoard(board); //give the selected piece a view of the board
+            board[firstI][firstJ].move(secondI,secondJ); //move the piece on the SELECTED PIECE'S copy of the board
+            board = board[firstI][firstJ].getBoard(); //set the main copy of the board to the selected piece's copy
             System.out.println("Second "+secondJ+","+secondI);
             firstJ = -1; //setting all this to 0 so that we'll know we're on first click again!
             firstI = -1;
@@ -92,9 +95,9 @@ public class Game extends JPanel implements MouseListener{
 
     //renders board
     public void paint(Graphics g){
-        int constraint = Math.min(frame.getWidth(),frame.getHeight());
-        int offset = constraint/10;
-        int side = constraint/10;
+        int constraint = Math.min(frame.getWidth(),frame.getHeight()); //whichever side is the constraint
+        int offset = constraint/10; // divided by 10 because there are 10 slots: offset, 8 tiles, another offset
+        int side = constraint/10; //side of a tile
         g.setColor(BG);
         g.fillRect(0, 0, frame.getWidth(), frame.getHeight());
         for(int i = 0; i < 8; i++){
@@ -114,26 +117,30 @@ public class Game extends JPanel implements MouseListener{
         }
     }
     public boolean validFirst(){
-        if(firstI < 0 || firstI > 7){
+        if(firstI < 0 || firstI > 7){ //is it within board range?
             return false;
         }
-        if(firstJ < 0 || firstJ > 7){
+        if(firstJ < 0 || firstJ > 7){ //is it within board range?
+            return false;
+        }
+        if(board[firstI][firstJ].getType() == '_'){ //can't select an empty square!
+            System.out.println("can't select an empty square, silly-head!");
             return false;
         }
         return true;
     }
 
     public boolean validSecond(){
-        if(secondI < 0 || secondI > 7){
+        if(secondI < 0 || secondI > 7){ //is it within board range?
             return false;
         }
-        if(secondJ < 0 || secondJ > 7){
+        if(secondJ < 0 || secondJ > 7){ //is it within board range?
             return false;
         }
-        if(secondI == firstI && secondJ == firstJ){
+        if(secondI == firstI && secondJ == firstJ){ //is the destination on the same tile as the starting point we selected?
             return false;
         }
-        if(!board[firstI][firstJ].checkIfValidMove(secondI,secondJ)){
+        if(!board[firstI][firstJ].checkIfValidMove(secondI,secondJ)){ //check if it is a valid move according to specific piece's requirements.
             return false;
         }
         return true;

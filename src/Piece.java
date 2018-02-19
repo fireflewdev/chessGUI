@@ -19,29 +19,34 @@ public class Piece{
         this.type = type;
     }
 
-    //get the board
-    public void getBoard(Piece[][] board){
+    //give the game your copy of the board
+    public Piece[][] getBoard(){
+        return board;
+    }
+    //set the game's board copy to yours
+    public void setBoard(Piece[][] board){
         this.board = board;
     }
-
-    //set the board
-    public Piece[][] setBoard(){
-        return board;
+    public char getType(){
+        return type;
     }
 
     //given a certain i and j to move (remember i = y and j = x), move there if it is a valid move.
-    public Piece[][] move(int i, int j){
-       if(checkIfValidMove(i,j)){
+    public void move(int i, int j){
+       if(checkIfValidMove(i,j)){ //the secondI and secondJ validation should already account for this but just in case
            board[currentI][currentJ] = new Piece('_',currentI,currentJ);
            currentI = i;
            currentJ = j;
            board[i][j] = this;
+       } else {
+           System.out.println("an error with secondI,J validation!"); //if something weird happens it'll print this for debugging
        }
-        return board;
     }
 
     //given a certain i and j to move (remember i = y and j = x) check to see if valid move.
     public boolean checkIfValidMove(int i, int j){
+        //lots of if statements specifying valid moves specific to different types, i.e. knight only moves in an L.
+        if(type == '_') return false; //can't move an empty square!
         return true;
     }
 }
