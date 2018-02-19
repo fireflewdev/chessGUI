@@ -1,7 +1,9 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
-public class Game extends JPanel{
+public class Game extends JPanel implements MouseListener{
     private int[][] board;
 
     /*
@@ -23,17 +25,42 @@ public class Game extends JPanel{
 
     public void paint(Graphics g){
         g.fillRect(100, 100, 400, 400);
-        for(int i = 100; i <= 400; i+=100){
-            for(int j = 100; j <= 400; j+=100){
+        for(int i = 100; i <= 500; i += 100){
+            for(int j = 100; j <= 500; j += 100){
                 g.clearRect(i, j, 50, 50);
             }
         }
 
-        for(int i = 150; i <= 450; i+=100){
-            for(int j = 150; j <= 450; j+=100){
+        for(int i = 150; i <= 550; i += 100){
+            for(int j = 150; j <= 550; j += 100){
                 g.clearRect(i, j, 50, 50);
             }
         }
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+
     }
 }
 
