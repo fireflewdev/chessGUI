@@ -12,25 +12,23 @@ import javax.swing.JPanel;
  * -An interface to interact with the board
  */
 public class Game extends JPanel implements MouseListener{
-    private boolean whiteTurn = true;
-    private int firstI = -1,firstJ = -1,secondI = -1,secondJ = -1;
-    private Piece[][] board;
-    private JFrame frame = new JFrame();
-    private final Color BG = Color.decode("#4D74B3");
-    private final Color SELECT = Color.decode("#9F4DB3");
-    private final Color PLACE = Color.decode("#62B34D");
-    private final Color BLACK = Color.decode("#CCCCCC");
-    private final Color WHITE = Color.decode("#222222");
+    private boolean whiteTurn = true; //is it white's turn? initialized as true since white goes first
+    private int firstI = -1,firstJ = -1,secondI = -1,secondJ = -1; //firstI,J: selected square. secondI,J: destination square.
+    private Piece[][] board; //le board
+    private JFrame frame = new JFrame(); //frame to put all the GUI on
+    private final Color BG = Color.decode("#4D74B3"); //color of background
+    private final Color SELECT = Color.decode("#9F4DB3"); //color that selected square lights up
+    private final Color BLACK = Color.decode("#CCCCCC"); //color of black square
+    private final Color WHITE = Color.decode("#222222"); //color of white square
 
     //constructor that manages the whole game
     public Game() {
         board = new Piece[8][8];
-
         //init game array
         //keep in mind that i is y and j is x. easy to get those confused
         for(int i = 0; i < board.length; i++) {
             for(int j = 0; j < board.length; j++) {
-                board[i][j] = new Piece('_',i,j); //_ = empty space
+                board[i][j] = new Piece('_','_',i,j); //_ = empty space
             }
         }
         repaint();
@@ -103,8 +101,42 @@ public class Game extends JPanel implements MouseListener{
             System.out.println("Second "+secondJ+","+secondI);
             firstJ = -1; //setting all this to 0 so that we'll know we're on first click again!
             firstI = -1;
+            whiteTurn = !whiteTurn; //switches turn
             repaint();
         }
+    }
+    public boolean validFirst(){
+        if(firstI < 0 || firstI > 7){ //is it within board range?
+            return false;
+        }
+        if(firstJ < 0 || firstJ > 7){ //is it within board range?
+            return false;
+        }
+        if(board[firstI][firstJ].getType() == '_'){ //can't select an empty square!
+            System.out.println("can't select an empty square, silly-head!");
+            return false;
+        }
+        if(board[firstI][firstJ].getColor() == 'w' && !whiteTurn || board[firstI][firstJ].getColor() == 'b' && whiteTurn){ //can't select opposite color piece!
+            System.out.println("can't select an opposite color piece, silly-head!");
+            return false;
+        }
+        return true;
+    }
+
+    public boolean validSecond(){
+        if(secondI < 0 || secondI > 7){ //is it within board range?
+            return false;
+        }
+        if(secondJ < 0 || secondJ > 7){ //is it within board range?
+            return false;
+        }
+        if(secondI == firstI && secondJ == firstJ){ //is the destination on the same tile as the starting point we selected?
+            return false;
+        }
+        if(!board[firstI][firstJ].checkIfValidMove(secondI,secondJ)){ //check if it is a valid move according to specific piece's requirements.
+            return false;
+        }
+        return true;
     }
 
     //renders board
@@ -134,36 +166,6 @@ public class Game extends JPanel implements MouseListener{
             g.fillRect(firstJ*side+offset, firstI*side+offset, side, side);
         }
     }
-    public boolean validFirst(){
-        if(firstI < 0 || firstI > 7){ //is it within board range?
-            return false;
-        }
-        if(firstJ < 0 || firstJ > 7){ //is it within board range?
-            return false;
-        }
-        if(board[firstI][firstJ].getType() == '_'){ //can't select an empty square!
-            System.out.println("can't select an empty square, silly-head!");
-            return false;
-        }
-        return true;
-    }
-
-    public boolean validSecond(){
-        if(secondI < 0 || secondI > 7){ //is it within board range?
-            return false;
-        }
-        if(secondJ < 0 || secondJ > 7){ //is it within board range?
-            return false;
-        }
-        if(secondI == firstI && secondJ == firstJ){ //is the destination on the same tile as the starting point we selected?
-            return false;
-        }
-        if(!board[firstI][firstJ].checkIfValidMove(secondI,secondJ)){ //check if it is a valid move according to specific piece's requirements.
-            return false;
-        }
-        return true;
-    }
-
     @Override
     public void mousePressed(MouseEvent e) {
 
@@ -184,5 +186,3 @@ public class Game extends JPanel implements MouseListener{
 
     }
 }
-
-//please dont be retarded github, thank you!

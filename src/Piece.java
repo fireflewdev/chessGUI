@@ -12,11 +12,13 @@
 public class Piece{
     private int currentI, currentJ; //current i an j values on board when piece invoked. remember i = y and j = x!
     private char type; //type of piece, types explained above
+    private char color; //colors: w, b, _. "_" is color for blank squares.
     private Piece[][] board; //copy of the board sent to this piece
-    public Piece(char type, int currentI, int currentJ){
-        this.currentJ = currentJ;
-        this.currentI = currentI;
+    public Piece(char type, char color, int currentI, int currentJ){
         this.type = type;
+        this.color = color;
+        this.currentI = currentI;
+        this.currentJ = currentJ;
     }
 
     //give the game your copy of the board
@@ -30,11 +32,14 @@ public class Piece{
     public char getType(){
         return type;
     }
+    public char getColor(){
+        return color;
+    }
 
     //given a certain i and j to move (remember i = y and j = x), move there if it is a valid move.
     public void move(int i, int j){
        if(checkIfValidMove(i,j)){ //the secondI and secondJ validation should already account for this but just in case
-           board[currentI][currentJ] = new Piece('_',currentI,currentJ);
+           board[currentI][currentJ] = new Piece('_','_',currentI,currentJ);
            currentI = i;
            currentJ = j;
            board[i][j] = this;
