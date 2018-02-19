@@ -50,18 +50,27 @@ public class Game extends JPanel implements MouseListener{
 
     //what to do on click
     public void mouseClicked(MouseEvent e) {
-        int constraint = Math.min(frame.getWidth(),frame.getHeight());
-        int offset = constraint/10;
-        int side = constraint/10;
+        int constraint = Math.min(frame.getWidth(),frame.getHeight()); //whichever side is the constraint
+        int offset = constraint/10; // divided by 10 because there are 10 slots: offset, 8 tiles, another offset
+        int side = constraint/10; //side of a tile
+        int center = Math.max(frame.getWidth(),frame.getHeight());
+        int centerOffset = (center - 8*side)/2;
         System.out.println("Mouse clicked!");
         if(firstI == -1){ //first click
             /*all calculations have to be in doubles or else the program will automatically round a small negative number to 0 since
              * it is dividing by the side length.
              */
-            firstJ = (int)(Math.floor((double)(e.getX()-offset)/(double)side)); //remember J = x, I = y!
-            firstI = (int)(Math.floor((double)(e.getY()-offset)/(double)side));
+            //setting firstI,J to corresponding pos on board.
+            if(frame.getWidth() > frame.getHeight()){ //this is to check to see how the board is offset
+                firstJ = (int)(Math.floor((double)(e.getX()-centerOffset)/(double)side)); //remember J = x, I = y!
+                firstI = (int)(Math.floor((double)(e.getY()-offset)/(double)side));
+            } else {
+                firstJ = (int)(Math.floor((double)(e.getX()-offset)/(double)side)); //remember J = x, I = y!
+                firstI = (int)(Math.floor((double)(e.getY()-centerOffset)/(double)side));
+            }
             secondI = -1;
             secondJ = -1;
+            System.out.println("First "+firstJ+","+firstI);
             if(!validFirst()){
                 firstJ = -1; //since invalid
                 firstI = -1;
@@ -70,10 +79,15 @@ public class Game extends JPanel implements MouseListener{
                 return;
             }
             repaint();
-            System.out.println("First "+firstJ+","+firstI);
         } else {
-            secondJ = (int)(Math.floor((double)(e.getX()-offset)/(double)side));
-            secondI = (int)(Math.floor((double)(e.getY()-offset)/(double)side));
+            //setting secondI,J to corresponding pos on board.
+            if(frame.getWidth() > frame.getHeight()){ //this is to check to see how the board is offset
+                secondJ = (int)(Math.floor((double)(e.getX()-centerOffset)/(double)side)); //remember J = x, I = y!
+                secondI = (int)(Math.floor((double)(e.getY()-offset)/(double)side));
+            } else {
+                secondJ = (int)(Math.floor((double)(e.getX()-offset)/(double)side)); //remember J = x, I = y!
+                secondI = (int)(Math.floor((double)(e.getY()-centerOffset)/(double)side));
+            }
             if(!validSecond()){
                 secondJ = -1; //since it's invalid we are cancelling the move. whoops!
                 secondI = -1;
@@ -98,16 +112,20 @@ public class Game extends JPanel implements MouseListener{
         int constraint = Math.min(frame.getWidth(),frame.getHeight()); //whichever side is the constraint
         int offset = constraint/10; // divided by 10 because there are 10 slots: offset, 8 tiles, another offset
         int side = constraint/10; //side of a tile
+        int center = Math.max(frame.getWidth(),frame.getHeight());
+        int centerOffset = (center - 8*side)/2;
         g.setColor(BG);
         g.fillRect(0, 0, frame.getWidth(), frame.getHeight());
         for(int i = 0; i < 8; i++){
             for(int j = 0; j < 8; j++){
                 if((j+i)%2 == 1){
                     g.setColor(WHITE);
-                    g.fillRect(j*side+offset, i*side+offset, side, side);
+                    if(frame.getWidth() > frame.getHeight()) g.fillRect(j*side+centerOffset, i*side+offset, side, side);
+                    else g.fillRect(j*side+offset, i*side+centerOffset, side, side);
                 } else {
                     g.setColor(BLACK);
-                    g.fillRect(j*side+offset, i*side+offset, side, side);
+                    if(frame.getWidth() > frame.getHeight()) g.fillRect(j*side+centerOffset, i*side+offset, side, side);
+                    else g.fillRect(j*side+offset, i*side+centerOffset, side, side);
                 }
             }
         }
