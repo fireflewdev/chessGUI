@@ -36,7 +36,9 @@ public class Game extends JPanel implements MouseListener{
                 g.clearRect(i, j, 50, 50);
             }
         }
+        repaint();
     }
+
 
     @Override
     public void mouseClicked(MouseEvent e) {
