@@ -14,9 +14,9 @@ import javax.swing.JPanel;
 public class Game extends JPanel implements MouseListener{
     private int[][] board;
     private JFrame frame = new JFrame();
-    final Color BG = Color.decode("#4D74B3");
-    final Color BLACK = Color.decode("#CCCCCC");
-    final Color WHITE = Color.decode("#111111");
+    private final Color BG = Color.decode("#4D74B3");
+    private final Color BLACK = Color.decode("#CCCCCC");
+    private final Color WHITE = Color.decode("#111111");
     public Game() {
         board = new int[8][8];
         for(int i = 0; i < board.length; i++) {
