@@ -3,5 +3,6 @@ public class Runner {
         System.out.println("starting a new chess game!");
         Game chess = new Game();
         //cool and good
+        //very nice and working
     }
 }
