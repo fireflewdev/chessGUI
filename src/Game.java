@@ -23,7 +23,8 @@ public class Game extends JPanel implements MouseListener{
     private final Color SELECT = Color.decode("#9F4DB3"); //color that selected square lights up
     private final Color BLACK = Color.decode("#CCCCCC"); //color of black square
     private final Color WHITE = Color.decode("#222222"); //color of white square
-    public BufferedImage img;
+    private int constraint,offset, side,center,centerOffset;
+    public BufferedImage wking,bking;
 
     //constructor that manages the whole game
     public Game() {
@@ -35,8 +36,6 @@ public class Game extends JPanel implements MouseListener{
                 board[i][j] = new Piece('_','_',i,j); //_ = empty space
             }
         }
-        repaint();
-
         //edit frame config
         frame.setSize(800, 800);
         frame.getContentPane().add(this);
@@ -45,20 +44,29 @@ public class Game extends JPanel implements MouseListener{
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setResizable(true);
         frame.setVisible(true);
+        constraint = Math.min(frame.getWidth(),frame.getHeight()); //whichever side is the constraint
+        offset = constraint/10; // divided by 10 because there are 10 slots: offset, 8 tiles, another offset
+        side = constraint/10; //side of a tile
+        center = Math.max(frame.getWidth(),frame.getHeight());
+        centerOffset = (center - 8*side)/2;
         //load images:
        try {
-            img = ImageIO.read(new File("strawberry.jpg"));
-        } catch (IOException e) {
+            wking = ImageIO.read(new File("images/whiteking.png"));
+            bking = ImageIO.read(new File("images/blackking.png"));
+
+       } catch (IOException e) {
+           System.out.print("lmao not found");
         }
+        repaint();
     }
 
     //what to do on click
     public void mouseClicked(MouseEvent e) {
-        int constraint = Math.min(frame.getWidth(),frame.getHeight()); //whichever side is the constraint
-        int offset = constraint/10; // divided by 10 because there are 10 slots: offset, 8 tiles, another offset
-        int side = constraint/10; //side of a tile
-        int center = Math.max(frame.getWidth(),frame.getHeight());
-        int centerOffset = (center - 8*side)/2;
+        constraint = Math.min(frame.getWidth(),frame.getHeight()); //whichever side is the constraint
+        offset = constraint/10; // divided by 10 because there are 10 slots: offset, 8 tiles, another offset
+        side = constraint/10; //side of a tile
+        center = Math.max(frame.getWidth(),frame.getHeight());
+        centerOffset = (center - 8*side)/2;
         System.out.println("Mouse clicked!");
         if(firstI == -1){ //first click
             /*all calculations have to be in doubles or else the program will automatically round a small negative number to 0 since
@@ -147,11 +155,11 @@ public class Game extends JPanel implements MouseListener{
 
     //renders board
     public void paint(Graphics g){
-        int constraint = Math.min(frame.getWidth(),frame.getHeight()); //whichever side is the constraint
-        int offset = constraint/10; // divided by 10 because there are 10 slots: offset, 8 tiles, another offset
-        int side = constraint/10; //side of a tile
-        int center = Math.max(frame.getWidth(),frame.getHeight());
-        int centerOffset = (center - 8*side)/2;
+        constraint = Math.min(frame.getWidth(),frame.getHeight()); //whichever side is the constraint
+        offset = constraint/10; // divided by 10 because there are 10 slots: offset, 8 tiles, another offset
+        side = constraint/10; //side of a tile
+        center = Math.max(frame.getWidth(),frame.getHeight());
+        centerOffset = (center - 8*side)/2;
         g.setColor(BG);
         g.fillRect(0, 0, frame.getWidth(), frame.getHeight());
 
@@ -168,17 +176,20 @@ public class Game extends JPanel implements MouseListener{
                 }
             }
         }
+        g.drawImage(wking, 0, 0, null);
+
         if(firstI != -1){
             g.setColor(SELECT);
             g.fillRect(firstJ*side+offset, firstI*side+offset, side, side);
         }
+
     }
 
     public Dimension getPreferredSize() {
-        if (img == null) {
-            return new Dimension(100,100);
+        if (wking == null) {
+            return new Dimension(constraint, constraint);
         } else {
-            return new Dimension(img.getWidth(null), img.getHeight(null));
+            return new Dimension(constraint, constraint);
         }
     }
     @Override
