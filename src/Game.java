@@ -1,10 +1,13 @@
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Font;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseEvent;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
+import java.awt.Image;
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
+import java.awt.*;
+import java.awt.event.*;
+import java.awt.image.BufferedImage;
+import java.io.*;
+import java.net.*;
+import javax.swing.*;
+
 /*
  * What should be here:
  * -8x8 array with board pieces
@@ -20,6 +23,7 @@ public class Game extends JPanel implements MouseListener{
     private final Color SELECT = Color.decode("#9F4DB3"); //color that selected square lights up
     private final Color BLACK = Color.decode("#CCCCCC"); //color of black square
     private final Color WHITE = Color.decode("#222222"); //color of white square
+    public BufferedImage img;
 
     //constructor that manages the whole game
     public Game() {
@@ -41,9 +45,11 @@ public class Game extends JPanel implements MouseListener{
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setResizable(true);
         frame.setVisible(true);
-
-        //add mouse listener
-        addMouseListener(this);
+        //load images:
+       try {
+            img = ImageIO.read(new File("strawberry.jpg"));
+        } catch (IOException e) {
+        }
     }
 
     //what to do on click
@@ -148,6 +154,7 @@ public class Game extends JPanel implements MouseListener{
         int centerOffset = (center - 8*side)/2;
         g.setColor(BG);
         g.fillRect(0, 0, frame.getWidth(), frame.getHeight());
+
         for(int i = 0; i < 8; i++){
             for(int j = 0; j < 8; j++){
                 if((j+i)%2 == 1){
@@ -164,6 +171,14 @@ public class Game extends JPanel implements MouseListener{
         if(firstI != -1){
             g.setColor(SELECT);
             g.fillRect(firstJ*side+offset, firstI*side+offset, side, side);
+        }
+    }
+
+    public Dimension getPreferredSize() {
+        if (img == null) {
+            return new Dimension(100,100);
+        } else {
+            return new Dimension(img.getWidth(null), img.getHeight(null));
         }
     }
     @Override
