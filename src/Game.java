@@ -35,12 +35,12 @@ public class Game extends JPanel implements MouseListener {
         //keep in mind that i is y and j is x. easy to get those confused
         char[] pieces = {'r', 'h', 'b', 'k', 'q', 'b', 'h', 'r'}; //array of chars specifying board setup
         for (int j = 0; j < board.length; j++) {
-            board[0][j] = new Piece(pieces[pieces.length-j-1], 'b', 0, j); //_ = empty space
+            board[0][j] = new Piece(pieces[pieces.length - j - 1], 'b', 0, j); //_ = empty space
         }
         for (int j = 0; j < board.length; j++) {
             board[1][j] = new Piece('p', 'b', 1, j); //_ = empty space
         }
-        for (int i = 2; i < board.length-2; i++) {
+        for (int i = 2; i < board.length - 2; i++) {
             for (int j = 0; j < board.length; j++) {
                 board[i][j] = new Piece('_', '_', i, j); //_ = empty space
             }
@@ -136,7 +136,7 @@ public class Game extends JPanel implements MouseListener {
                 return;
             }
             Piece temp = board[firstI][firstJ];
-            board[firstI][firstJ] =  board[secondI][secondJ];
+            board[firstI][firstJ] = board[secondI][secondJ];
             board[secondI][secondJ] = temp;
             //board = board[firstI][firstJ].getBoard();
             System.out.println("Second " + secondJ + "," + secondI);
@@ -207,7 +207,7 @@ public class Game extends JPanel implements MouseListener {
                     else g.fillRect(j * side + offset, i * side + centerOffset, side, side);
                 }
                 if (firstI != -1) {
-                    if(firstI == i && firstJ == j) {
+                    if (firstI == i && firstJ == j) {
                         g.setColor(SELECT);
                         if (frame.getWidth() > frame.getHeight())
                             g.fillRect(firstJ * side + centerOffset, firstI * side + offset, side, side);
@@ -215,7 +215,7 @@ public class Game extends JPanel implements MouseListener {
                     }
                 }
                 char type = board[i][j].getType();
-                if(type == 'k') {
+                if (type == 'k') {
                     if (board[i][j].getColor() == 'w') {
                         image = wking.getScaledInstance(side, side, imageScale); //scale image
                         if (frame.getWidth() > frame.getHeight()) //constraint image
@@ -227,8 +227,7 @@ public class Game extends JPanel implements MouseListener {
                             g.drawImage(image, j * side + centerOffset, i * side + offset, null);
                         else g.drawImage(image, j * side + offset, i * side + centerOffset, null);
                     }
-                }
-                else if(type == 'h') {
+                } else if (type == 'h') {
                     if (board[i][j].getColor() == 'w') {
                         image = wknight.getScaledInstance(side, side, imageScale); //scale image
                         if (frame.getWidth() > frame.getHeight()) //constraint image
@@ -240,8 +239,7 @@ public class Game extends JPanel implements MouseListener {
                             g.drawImage(image, j * side + centerOffset, i * side + offset, null);
                         else g.drawImage(image, j * side + offset, i * side + centerOffset, null);
                     }
-                }
-                else if(type == 'b') {
+                } else if (type == 'b') {
                     if (board[i][j].getColor() == 'w') {
                         image = wbishop.getScaledInstance(side, side, imageScale); //scale image
                         if (frame.getWidth() > frame.getHeight()) //constraint image
@@ -253,8 +251,7 @@ public class Game extends JPanel implements MouseListener {
                             g.drawImage(image, j * side + centerOffset, i * side + offset, null);
                         else g.drawImage(image, j * side + offset, i * side + centerOffset, null);
                     }
-                }
-                else if(type == 'q') {
+                } else if (type == 'q') {
                     if (board[i][j].getColor() == 'w') {
                         image = wqueen.getScaledInstance(side, side, imageScale); //scale image
                         if (frame.getWidth() > frame.getHeight()) //constraint image
@@ -266,8 +263,7 @@ public class Game extends JPanel implements MouseListener {
                             g.drawImage(image, j * side + centerOffset, i * side + offset, null);
                         else g.drawImage(image, j * side + offset, i * side + centerOffset, null);
                     }
-                }
-                else if(type == 'r') {
+                } else if (type == 'r') {
                     if (board[i][j].getColor() == 'w') {
                         image = wrook.getScaledInstance(side, side, imageScale); //scale image
                         if (frame.getWidth() > frame.getHeight()) //constraint image
@@ -279,8 +275,7 @@ public class Game extends JPanel implements MouseListener {
                             g.drawImage(image, j * side + centerOffset, i * side + offset, null);
                         else g.drawImage(image, j * side + offset, i * side + centerOffset, null);
                     }
-                }
-                else if(type == 'p') {
+                } else if (type == 'p') {
                     if (board[i][j].getColor() == 'w') {
                         image = wpawn.getScaledInstance(side, side, imageScale); //scale image
                         if (frame.getWidth() > frame.getHeight()) //constraint image
@@ -325,15 +320,16 @@ public class Game extends JPanel implements MouseListener {
     public void mouseExited(MouseEvent e) {
 
     }
-    public String toString(){
+
+    public String toString() {
         String out = "";
         for (int i = 0; i < board.length; i++) {
             for (int j = 0; j < board.length; j++) {
-                if(board[i][j].getColor() != 'b') out+=board[i][j].getType() + " ";
-                else out+=(char)(board[i][j].getType()-32) + " ";
+                if (board[i][j].getColor() != 'b') out += board[i][j].getType() + " ";
+                else out += (char) (board[i][j].getType() - 32) + " ";
 
             }
-            out+="\n";
+            out += "\n";
         }
         return out;
     }
