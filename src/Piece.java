@@ -13,7 +13,6 @@ public class Piece{
     private int currentI, currentJ; //current i an j values on board when piece invoked. remember i = y and j = x!
     private char type; //type of piece, types explained above
     private char color; //colors: w, b, _. "_" is color for blank squares.
-    private Piece[][] board; //copy of the board sent to this piece
     public Piece(char type, char color, int currentI, int currentJ){
         this.type = type;
         this.color = color;
@@ -21,14 +20,8 @@ public class Piece{
         this.currentJ = currentJ;
     }
 
-    //give the game your copy of the board
-    public Piece[][] getBoard(){
-        return board;
-    }
-    //set the game's board copy to yours
-    public void setBoard(Piece[][] board){
-        this.board = board;
-    }
+    //removed board editing stuff since that is now all done in the Game class.
+
     public char getType(){
         return type;
     }
@@ -36,20 +29,8 @@ public class Piece{
         return color;
     }
 
-    //given a certain i and j to move (remember i = y and j = x), move there if it is a valid move.
-    public void move(int i, int j){
-       if(checkIfValidMove(i,j)){ //the secondI and secondJ validation should already account for this but just in case
-           board[currentI][currentJ] = new Piece('_','_',currentI,currentJ);
-           currentI = i;
-           currentJ = j;
-           board[i][j] = this;
-       } else {
-           System.out.println("an error with secondI,J validation!"); //if something weird happens it'll print this for debugging
-       }
-    }
-
     //given a certain i and j to move (remember i = y and j = x) check to see if valid move.
-    public boolean checkIfValidMove(int i, int j){
+    public boolean checkIfValidMove(int i, int j, Piece[][] board){
         //lots of if statements specifying valid moves specific to different types, i.e. knight only moves in an L.
         if(type == '_') return false; //can't move an empty square!
         return true;
