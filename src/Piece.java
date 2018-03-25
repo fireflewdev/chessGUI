@@ -38,7 +38,7 @@ public class Piece{
     public boolean checkIfEmpty(int i, int j, Piece[][] board){
         return board[i][j].getType() == '_';
     }
-    public boolean checkIfEmptyInARowP(int fi, int j, int li, Piece[][] board){ //for the pawn
+    public boolean checkIfEmptyInAColumnPawn(int fi, int j, int li, Piece[][] board){ //for the pawn
         int f = Math.min(fi, li);
         int l = Math.max(fi, li);
         for (int i = f; i <= l; i++) {
@@ -50,7 +50,7 @@ public class Piece{
         }
         return true;
     }
-    public boolean checkIfEmptyInARow(int fi, int fj, int li, int lj, Piece[][] board){ //for everyone else
+    public boolean checkIfEmptyInALine(int fi, int fj, int li, int lj, Piece[][] board){ //for everyone else
         int f = Math.min(fi, li);
         int l = Math.max(fi, li);
         for (int i = f; i <= l; i++) {
@@ -71,6 +71,23 @@ public class Piece{
         }
         return true;
     }
+    public boolean checkIfEmptyInADiagonal(int fi, int fj, int li, int lj, Piece[][] board){ //for everyone else
+        if(Math.abs(fi-li) != Math.abs(fj-lj)) return false;
+        int smallI = Math.min(fi, li);
+        int largeI = Math.max(fi, li);
+        int smallJ = Math.min(fj, lj);
+        int largeJ = Math.max(fj, lj);
+        for (int i = smallI; i <= largeI; i++) {
+            for(int j = smallJ; j <= largeJ; j++) {
+                if (i != fi && i != li && j != fj && j != lj) {
+                    if (!checkIfEmpty(i, j, board)) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
 
     public void takePiece(int i, int j, Piece[][] board){
         taken = board[i][j].getType();
@@ -85,7 +102,7 @@ public class Piece{
             currentJ = j;
             return true;
         } else {
-            System.out.println("invalid "+type+" move at steps: " + (currentI) + " , " + (currentJ));
+            System.out.println("invalid "+type+" move at steps: " + (i) + " , " + (j));
             return false;
         }
     }
@@ -99,6 +116,7 @@ public class Piece{
         else if(type == 'p' && !pawnValid(i, j, board)) return false; //pawn valid
         else if(type == 'h' && !knightValid(i, j, board)) return false; //knight valid
         else if(type == 'r' && !rookValid(i, j, board)) return false; //rook valid
+        else if(type == 'b' && !bishopValid(i, j, board)) return false; //rook valid
 
         return true;
     }
@@ -116,7 +134,7 @@ public class Piece{
         }
         if(i - currentI == 2*factor && !moved){
             if(currentJ == j) {
-                return checkIfEmptyInARowP(currentI, currentJ, i, board);
+                return checkIfEmptyInAColumnPawn(currentI, currentJ, i, board);
             }
         }
         return false;
@@ -137,11 +155,18 @@ public class Piece{
         return false;
     }
     public boolean rookValid(int i, int j, Piece[][] board){
-        if(currentI == i || currentJ == j) {
-            if (checkIfEmptyInARow(currentI, currentJ, i, j, board)) { //sideways
+        if(currentI == i || currentJ == j) { //along same lines
+            if (checkIfEmptyInALine(currentI, currentJ, i, j, board)) {
                 if(!checkIfEmpty(i, j, board)) takePiece(i, j, board);
                 return true;
             }
+        }
+        return false;
+    }
+    public boolean bishopValid(int i, int j, Piece[][] board){
+        if(checkIfEmptyInADiagonal(currentI, currentJ, i, j, board)){
+            if(!checkIfEmpty(i, j, board)) takePiece(i, j, board);
+            return true;
         }
         return false;
     }
