@@ -1,5 +1,6 @@
 import java.awt.Image;
 import javax.imageio.ImageIO;
+import java.nio.file.*;
 import javax.swing.ImageIcon;
 import java.awt.*;
 import java.awt.event.*;
@@ -18,14 +19,18 @@ public class Game extends JPanel implements MouseListener {
     private Image image;
     private boolean whiteTurn = true; //is it white's turn? initialized as true since white goes first
     private int firstI = -1, firstJ = -1, secondI = -1, secondJ = -1; //firstI,J: selected square. secondI,J: destination square.
+    private int constraint, offset, side, center, centerOffset; //offsets and stuff
+    private int pI, pJ; //params for painting
+    private BufferedImage paintImage;
     private Piece[][] board; //le board
     private JFrame frame = new JFrame(); //frame to put all the GUI on
+    private File tempImg;
     private final Color BG = Color.decode("#31607d"); //color of background
     private final Color SELECT = Color.decode("#835996"); //color that selected square lights up
     private final Color BLACK = Color.decode("#597f96"); //color of black square
     private final Color WHITE = Color.decode("#97b0bf"); //color of white square
+    private final String path = "src/";
     private final int imageScale = Image.SCALE_DEFAULT;
-    private int constraint, offset, side, center, centerOffset;
     public Image wking, bking, wknight, bknight, wbishop, bbishop, wqueen, bqueen, wrook, brook, wpawn, bpawn;
 
     //constructor that manages the whole game
@@ -53,10 +58,11 @@ public class Game extends JPanel implements MouseListener {
         }
         System.out.println(this.toString());
         //edit frame config
-        frame.setSize(800, 800);
+        //frame.setSize(800, 800);
+        frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
         frame.getContentPane().add(this);
         frame.setLocationRelativeTo(null);
-        frame.setBackground(BG);
+        //frame.setBackground(BG);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setResizable(true);
         frame.setVisible(true);
@@ -67,23 +73,23 @@ public class Game extends JPanel implements MouseListener {
         centerOffset = (center - 8 * side) / 2;
         //load images:
         try {
-            wking = ImageIO.read(new File("images/whiteking.png"));
-            bking = ImageIO.read(new File("images/blackking.png"));
-            wknight = ImageIO.read(new File("images/whiteknight.png"));
-            bknight = ImageIO.read(new File("images/blackknight.png"));
-            wbishop = ImageIO.read(new File("images/whitebishop.png"));
-            bbishop = ImageIO.read(new File("images/blackbishop.png"));
-            wqueen = ImageIO.read(new File("images/whitequeen.png"));
-            bqueen = ImageIO.read(new File("images/blackqueen.png"));
-            wrook = ImageIO.read(new File("images/whiterook.png"));
-            brook = ImageIO.read(new File("images/blackrook.png"));
-            wpawn = ImageIO.read(new File("images/whitepawn.png"));
-            bpawn = ImageIO.read(new File("images/blackpawn.png"));
+            wking = ImageIO.read(new File(path + "whiteking.png"));
+            bking = ImageIO.read(new File(path + "blackking.png"));
+            wknight = ImageIO.read(new File(path + "whiteknight.png"));
+            bknight = ImageIO.read(new File(path + "blackknight.png"));
+            wbishop = ImageIO.read(new File(path + "whitebishop.png"));
+            bbishop = ImageIO.read(new File(path + "blackbishop.png"));
+            wqueen = ImageIO.read(new File(path + "whitequeen.png"));
+            bqueen = ImageIO.read(new File(path + "blackqueen.png"));
+            wrook = ImageIO.read(new File(path + "whiterook.png"));
+            brook = ImageIO.read(new File(path + "blackrook.png"));
+            wpawn = ImageIO.read(new File(path + "whitepawn.png"));
+            bpawn = ImageIO.read(new File(path + "blackpawn.png"));
         } catch (IOException e) {
-            System.out.print("ERROR: a file is not found");
+            System.out.print("ERROR: a file is not found: ");
         }
         addMouseListener(this);
-        repaint();
+        redraw();
     }
 
     //what to do on click
@@ -110,13 +116,14 @@ public class Game extends JPanel implements MouseListener {
             secondJ = -1;
             System.out.println("First " + firstJ + "," + firstI);
             if (!validFirst()) {
+                int tempI = firstI;
+                int tempJ = firstJ;
                 firstJ = -1; //since invalid
                 firstI = -1;
                 System.out.println("Invalid first");
-                repaint();
                 return;
             }
-            repaint();
+            redraw();
         } else {
             //setting secondI,J to corresponding pos on board.
             if (frame.getWidth() > frame.getHeight()) { //this is to check to see how the board is offset
@@ -127,12 +134,14 @@ public class Game extends JPanel implements MouseListener {
                 secondI = (int) (Math.floor((double) (e.getY() - centerOffset) / (double) side));
             }
             if (!validSecond()) {
+                int tempI = firstI;
+                int tempJ = firstJ;
                 secondJ = -1; //since it's invalid we are cancelling the move. whoops!
                 secondI = -1;
                 System.out.println("Invalid second");
                 firstJ = -1; //setting all this to 0 so that we'll know we're on first click again!
                 firstI = -1;
-                repaint();
+                redraw();
                 return;
             }
             Piece temp = board[firstI][firstJ];
@@ -144,7 +153,7 @@ public class Game extends JPanel implements MouseListener {
             firstJ = -1; //setting all this to 0 so that we'll know we're on first click again!
             firstI = -1;
             whiteTurn = !whiteTurn; //switches turn
-            repaint();
+            redraw();
         }
     }
 
@@ -182,6 +191,17 @@ public class Game extends JPanel implements MouseListener {
         return true;
     }
 
+    //renders piece
+    public void paintPiece(Graphics g, Image image, int i, int j){
+        constraint = Math.min(frame.getWidth(), frame.getHeight()); //whichever side is the constraint
+        offset = constraint / 10; // divided by 10 because there are 10 slots: offset, 8 tiles, another offset
+        side = constraint / 10; //side of a tile
+        center = Math.max(frame.getWidth(), frame.getHeight());
+        centerOffset = (center - 8 * side) / 2;
+        if (frame.getWidth() > frame.getHeight()) //constraint image
+            g.drawImage(image, j * side + centerOffset, i * side + offset, side, side,null);
+        else g.drawImage(image, j * side + offset, i * side + centerOffset, side, side, null);
+    }
     //renders board
     public void paint(Graphics g) {
         constraint = Math.min(frame.getWidth(), frame.getHeight()); //whichever side is the constraint
@@ -189,11 +209,12 @@ public class Game extends JPanel implements MouseListener {
         side = constraint / 10; //side of a tile
         center = Math.max(frame.getWidth(), frame.getHeight());
         centerOffset = (center - 8 * side) / 2;
+        //draw board
         g.setColor(BG);
         g.fillRect(0, 0, frame.getWidth(), frame.getHeight());
-
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
+                //draw pattern
                 if ((j + i) % 2 == 1) {
                     g.setColor(WHITE);
                     if (frame.getWidth() > frame.getHeight())
@@ -214,91 +235,52 @@ public class Game extends JPanel implements MouseListener {
                         else g.fillRect(firstJ * side + offset, firstI * side + centerOffset, side, side);
                     }
                 }
+                //draw piece
                 char type = board[i][j].getType();
                 if (type == 'k') {
                     if (board[i][j].getColor() == 'w') {
-                        image = wking.getScaledInstance(side, side, imageScale); //scale image
-                        if (frame.getWidth() > frame.getHeight()) //constraint image
-                            g.drawImage(image, j * side + centerOffset, i * side + offset, null);
-                        else g.drawImage(image, j * side + offset, i * side + centerOffset, null);
+                        paintPiece(g, wking, i, j);
                     } else {
-                        image = bking.getScaledInstance(side, side, imageScale);
-                        if (frame.getWidth() > frame.getHeight())
-                            g.drawImage(image, j * side + centerOffset, i * side + offset, null);
-                        else g.drawImage(image, j * side + offset, i * side + centerOffset, null);
+                        paintPiece(g, bking, i, j);
                     }
                 } else if (type == 'h') {
                     if (board[i][j].getColor() == 'w') {
-                        image = wknight.getScaledInstance(side, side, imageScale); //scale image
-                        if (frame.getWidth() > frame.getHeight()) //constraint image
-                            g.drawImage(image, j * side + centerOffset, i * side + offset, null);
-                        else g.drawImage(image, j * side + offset, i * side + centerOffset, null);
+                        paintPiece(g, wknight, i, j);
                     } else {
-                        image = bknight.getScaledInstance(side, side, imageScale);
-                        if (frame.getWidth() > frame.getHeight())
-                            g.drawImage(image, j * side + centerOffset, i * side + offset, null);
-                        else g.drawImage(image, j * side + offset, i * side + centerOffset, null);
+                        paintPiece(g, bknight, i, j);
                     }
                 } else if (type == 'b') {
                     if (board[i][j].getColor() == 'w') {
-                        image = wbishop.getScaledInstance(side, side, imageScale); //scale image
-                        if (frame.getWidth() > frame.getHeight()) //constraint image
-                            g.drawImage(image, j * side + centerOffset, i * side + offset, null);
-                        else g.drawImage(image, j * side + offset, i * side + centerOffset, null);
+                        paintPiece(g, wbishop, i, j);
                     } else {
-                        image = bbishop.getScaledInstance(side, side, imageScale);
-                        if (frame.getWidth() > frame.getHeight())
-                            g.drawImage(image, j * side + centerOffset, i * side + offset, null);
-                        else g.drawImage(image, j * side + offset, i * side + centerOffset, null);
+                        paintPiece(g, bbishop, i, j);
                     }
                 } else if (type == 'q') {
                     if (board[i][j].getColor() == 'w') {
-                        image = wqueen.getScaledInstance(side, side, imageScale); //scale image
-                        if (frame.getWidth() > frame.getHeight()) //constraint image
-                            g.drawImage(image, j * side + centerOffset, i * side + offset, null);
-                        else g.drawImage(image, j * side + offset, i * side + centerOffset, null);
+                        paintPiece(g, wqueen, i, j);
                     } else {
-                        image = bqueen.getScaledInstance(side, side, imageScale);
-                        if (frame.getWidth() > frame.getHeight())
-                            g.drawImage(image, j * side + centerOffset, i * side + offset, null);
-                        else g.drawImage(image, j * side + offset, i * side + centerOffset, null);
+                        paintPiece(g, bqueen, i, j);
                     }
                 } else if (type == 'r') {
                     if (board[i][j].getColor() == 'w') {
-                        image = wrook.getScaledInstance(side, side, imageScale); //scale image
-                        if (frame.getWidth() > frame.getHeight()) //constraint image
-                            g.drawImage(image, j * side + centerOffset, i * side + offset, null);
-                        else g.drawImage(image, j * side + offset, i * side + centerOffset, null);
+                        paintPiece(g, wrook, i, j);
                     } else {
-                        image = brook.getScaledInstance(side, side, imageScale);
-                        if (frame.getWidth() > frame.getHeight())
-                            g.drawImage(image, j * side + centerOffset, i * side + offset, null);
-                        else g.drawImage(image, j * side + offset, i * side + centerOffset, null);
+                        paintPiece(g, brook, i, j);
                     }
                 } else if (type == 'p') {
                     if (board[i][j].getColor() == 'w') {
-                        image = wpawn.getScaledInstance(side, side, imageScale); //scale image
-                        if (frame.getWidth() > frame.getHeight()) //constraint image
-                            g.drawImage(image, j * side + centerOffset, i * side + offset, null);
-                        else g.drawImage(image, j * side + offset, i * side + centerOffset, null);
+                        paintPiece(g, wpawn, i, j);
                     } else {
-                        image = bpawn.getScaledInstance(side, side, imageScale);
-                        if (frame.getWidth() > frame.getHeight())
-                            g.drawImage(image, j * side + centerOffset, i * side + offset, null);
-                        else g.drawImage(image, j * side + offset, i * side + centerOffset, null);
+                        paintPiece(g, bpawn, i, j);
                     }
                 }
+
             }
         }
-
     }
 
-    public Dimension getPreferredSize() {
-        if (wking == null) {
-            return new Dimension(constraint, constraint);
-        } else {
-            return new Dimension(constraint, constraint);
-        }
+    public void redraw() {
+        repaint();
     }
 
     @Override
