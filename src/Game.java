@@ -1,12 +1,9 @@
 import java.awt.Image;
 import javax.imageio.ImageIO;
-import java.nio.file.*;
-import javax.swing.ImageIcon;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.net.*;
 import javax.swing.*;
 
 /*
@@ -29,7 +26,7 @@ public class Game extends JPanel implements MouseListener {
     private final Color SELECT = Color.decode("#835996"); //color that selected square lights up
     private final Color BLACK = Color.decode("#597f96"); //color of black square
     private final Color WHITE = Color.decode("#97b0bf"); //color of white square
-    private final String path = "src/";
+    private final String path = "res/";
     private final int imageScale = Image.SCALE_DEFAULT;
     public Image wking, bking, wknight, bknight, wbishop, bbishop, wqueen, bqueen, wrook, brook, wpawn, bpawn;
 
