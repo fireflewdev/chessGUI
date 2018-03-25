@@ -149,7 +149,7 @@ public class Game extends JPanel implements MouseListener {
             /*MOVING THE PIECES*/
 
             Piece temp = board[firstI][firstJ];
-            temp.move(secondI,secondJ,board);
+            //temp.move(secondI,secondJ,board);
             board[firstI][firstJ] = new Piece('_', '_', firstI, firstJ);
             board[secondI][secondJ] = temp;
             //board = board[firstI][firstJ].getBoard();
@@ -183,14 +183,11 @@ public class Game extends JPanel implements MouseListener {
     public boolean validSecond() {
         if (secondI < 0 || secondI > 7) { //is it within board range?
             return false;
-        }
-        if (secondJ < 0 || secondJ > 7) { //is it within board range?
+        } else if (secondJ < 0 || secondJ > 7) { //is it within board range?
             return false;
-        }
-        if (secondI == firstI && secondJ == firstJ) { //is the destination on the same tile as the starting point we selected?
+        } else if (secondI == firstI && secondJ == firstJ) { //is the destination on the same tile as the starting point we selected?
             return false;
-        }
-        if (!board[firstI][firstJ].checkIfValidMove(secondI, secondJ, board)) { //check if it is a valid move according to specific piece's requirements.
+        } else if (!board[firstI][firstJ].move(secondI, secondJ, board)) { //check if it is a valid move according to specific piece's requirements.
             return false;
         }
         return true;
@@ -235,13 +232,13 @@ public class Game extends JPanel implements MouseListener {
                     }
                 } else {
                     if ((j + i) % 2 == 1) {
-                        g.setColor(board[firstI][firstJ].checkIfTakeable(i,j, board)?TAKEWHITE:VALIDWHITE); //set color to TAKEWHITE if takeable and VALIDWHITE if valid
+                        g.setColor(board[i][j].getType()!='_'?TAKEWHITE:VALIDWHITE); //set color to TAKEWHITE if takeable and VALIDWHITE if valid
                         if (frame.getWidth() > frame.getHeight())
                             g.fillRect(j * side + centerOffset, i * side + offset, side, side);
                         else g.fillRect(j * side + offset, i * side + centerOffset, side, side);
 
                     } else {
-                        g.setColor(board[firstI][firstJ].checkIfTakeable(i,j, board)?TAKEBLACK:VALIDBLACK);
+                        g.setColor(board[i][j].getType()!='_'?TAKEBLACK:VALIDBLACK);
                         if (frame.getWidth() > frame.getHeight())
                             g.fillRect(j * side + centerOffset, i * side + offset, side, side);
                         else g.fillRect(j * side + offset, i * side + centerOffset, side, side);

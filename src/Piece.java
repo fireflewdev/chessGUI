@@ -15,12 +15,15 @@ public class Piece{
     private int factor;
     private char type; //type of piece, types explained above
     private char color; //colors: w, b, _. "_" is color for blank squares.
+    private char taken; //which type taken
     public Piece(char type, char color, int currentI, int currentJ){
         this.type = type;
         this.color = color;
-        factor = this.color == 'w'?-1:1; //blacks checking will be opposite of white so we make it negative
         this.currentI = currentI;
         this.currentJ = currentJ;
+        taken = '_'; //nothing taken
+        factor = this.color == 'w'?-1:1; //blacks checking will be opposite of white so we make it negative
+
     }
 
     //removed board editing stuff since that is now all done in the Game class.
@@ -35,111 +38,111 @@ public class Piece{
     public boolean checkIfEmpty(int i, int j, Piece[][] board){
         return board[i][j].getType() == '_';
     }
-    public boolean checkIfEmptyInARow(int li, int lj, Piece[][] board){
-        if(color == 'w') {
-            for (int i = currentI + factor; i >= li; i--) {
-                if (!checkIfEmpty(i, lj, board)) {
+    public boolean checkIfEmptyInARowP(int fi, int j, int li, Piece[][] board){ //for the pawn
+        int f = Math.min(fi, li);
+        int l = Math.max(fi, li);
+        for (int i = f; i <= l; i++) {
+            if(i != fi) {
+                if (!checkIfEmpty(i, j, board)) {
                     return false;
                 }
             }
-            for (int j = currentJ; j >= lj; j--) {
-                if (!checkIfEmpty(li, j, board)) {
-                    return false;
-                }
-            }
-            return true;
-        } else {
-            for (int i = currentI + factor; i <= li; i++) {
-                if (!checkIfEmpty(i, lj, board)) {
-                    return false;
-                }
-            }
-            for (int j = currentJ; j <= lj; j++) {
-                if (!checkIfEmpty(li, j, board)) {
-                    return false;
-                }
-            }
-            return true;
         }
+        return true;
+    }
+    public boolean checkIfEmptyInARow(int fi, int fj, int li, int lj, Piece[][] board){ //for everyone else
+        int f = Math.min(fi, li);
+        int l = Math.max(fi, li);
+        for (int i = f; i <= l; i++) {
+            if(i != fi &&  i != li) {
+                if (!checkIfEmpty(i, fj, board)) {
+                    return false;
+                }
+            }
+        }
+        f = Math.min(fj, lj);
+        l = Math.max(fj, lj);
+        for (int j = f; j <= l; j++) {
+            if(j != fj &&  j != lj) {
+                if (!checkIfEmpty(fi, j, board)) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     public void takePiece(int i, int j, Piece[][] board){
-        if(!checkIfEmpty(i, j, board)){
-            System.out.println("Taking (color,type)"+board[i][j].getColor()+","+board[i][j].getType());
-        }
+        taken = board[i][j].getType();
     }
     public boolean move(int i, int j, Piece[][] board){
         if(checkIfValidMove(i, j, board)) {
+            if(taken != '_') {
+                System.out.println("taking " + taken);
+            }
             moved = true;
             currentI = i;
             currentJ = j;
             return true;
         } else {
+            System.out.println("invalid "+type+" move at steps: " + (currentI) + " , " + (currentJ));
             return false;
         }
     }
     //given a certain i and j to move (remember i = y and j = x) check to see if valid move.
-    public boolean checkIfTakeable(int i, int j, Piece[][] board){
-        if(type == '_') return false; //can't move an empty square!
-        if(color == board[i][j].getColor()) return false; //can't interact with same color pieces!
-        else if(type == 'p'){
-            if(Math.abs(j - currentJ) == 1){
-                return !checkIfEmpty(i, j, board);
-            }
-        } else if(type == 'h'){
-            if(Math.abs(i - currentI) == 1){ //sideways L, can move backwards
-                if(Math.abs(j - currentJ) == 2){
-                    return !checkIfEmpty(i, j, board);
-                }
-            }
-            if(Math.abs(i - currentI) == 2){ //long L, can move backwards
-                if(Math.abs(j - currentJ) == 1){
-                    return !checkIfEmpty(i, j, board);
-                }
-            }
-        }
-        return false;
-    }
+
     public boolean checkIfValidMove(int i, int j, Piece[][] board){
+        taken = '_';
         //lots of if statements specifying valid moves specific to different types, i.e. knight only moves in an L.
         if(type == '_') return false; //can't move an empty square!
         if(color == board[i][j].getColor()) return false; //can't interact with same color pieces!
         else if(type == 'p' && !pawnValid(i, j, board)) return false; //pawn valid
         else if(type == 'h' && !knightValid(i, j, board)) return false; //knight valid
+        else if(type == 'r' && !rookValid(i, j, board)) return false; //rook valid
+
         return true;
     }
 
     public boolean pawnValid(int i, int j, Piece[][] board){
-        if(i - currentI == 1*factor){ //if white, will check if dif is -1. if black, will check if dif is 1.
+        //System.out.println("it got here");
+
+        if(i - currentI == factor){ //if white, will check if dif is -1. if black, will check if dif is 1.
             if(currentJ == j) {
                 return checkIfEmpty(i, j, board);
-            } else if (checkIfTakeable(i, j, board)){
+            } else if(Math.abs(j - currentJ) == 1 && !checkIfEmpty(i, j, board)){
                 takePiece(i, j, board);
                 return true;
             }
         }
         if(i - currentI == 2*factor && !moved){
             if(currentJ == j) {
-                return checkIfEmptyInARow(i, j, board);
+                return checkIfEmptyInARowP(currentI, currentJ, i, board);
             }
         }
-        System.out.println("invalid "+type+" move at steps: " + (i - currentI) + " , " + (j - currentJ));
         return false;
     }
     public boolean knightValid(int i, int j, Piece[][] board){
         if(Math.abs(i - currentI) == 1){ //sideways L, can move backwards
             if(Math.abs(j - currentJ) == 2){
-                takePiece(i, j, board);
+                if(!checkIfEmpty(i, j, board)) takePiece(i, j, board);
                 return true;
             }
         }
         if(Math.abs(i - currentI) == 2){ //long L, can move backwards
             if(Math.abs(j - currentJ) == 1){
-                takePiece(i, j, board);
+                if(!checkIfEmpty(i, j, board)) takePiece(i, j, board);
                 return true;
             }
         }
-        System.out.println("invalid "+type+" move at steps: " + (i - currentI) + " , " + (j - currentJ));
+        return false;
+    }
+    public boolean rookValid(int i, int j, Piece[][] board){
+        if(currentI == i || currentJ == j) {
+            if (checkIfEmptyInARow(currentI, currentJ, i, j, board)) { //sideways
+                if(!checkIfEmpty(i, j, board)) takePiece(i, j, board);
+                return true;
+            }
+        }
         return false;
     }
 }
