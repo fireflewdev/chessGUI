@@ -81,9 +81,21 @@ public class Piece{
     //given a certain i and j to move (remember i = y and j = x) check to see if valid move.
     public boolean checkIfTakeable(int i, int j, Piece[][] board){
         if(type == '_') return false; //can't move an empty square!
+        if(color == board[i][j].getColor()) return false; //can't interact with same color pieces!
         else if(type == 'p'){
             if(Math.abs(j - currentJ) == 1){
                 return !checkIfEmpty(i, j, board);
+            }
+        } else if(type == 'h'){
+            if(Math.abs(i - currentI) == 1){ //sideways L, can move backwards
+                if(Math.abs(j - currentJ) == 2){
+                    return !checkIfEmpty(i, j, board);
+                }
+            }
+            if(Math.abs(i - currentI) == 2){ //long L, can move backwards
+                if(Math.abs(j - currentJ) == 1){
+                    return !checkIfEmpty(i, j, board);
+                }
             }
         }
         return false;
@@ -91,7 +103,9 @@ public class Piece{
     public boolean checkIfValidMove(int i, int j, Piece[][] board){
         //lots of if statements specifying valid moves specific to different types, i.e. knight only moves in an L.
         if(type == '_') return false; //can't move an empty square!
-        else if(type == 'p' && !pawnValid(i, j, board)) return false;
+        if(color == board[i][j].getColor()) return false; //can't interact with same color pieces!
+        else if(type == 'p' && !pawnValid(i, j, board)) return false; //pawn valid
+        else if(type == 'h' && !knightValid(i, j, board)) return false; //knight valid
         return true;
     }
 
@@ -109,7 +123,23 @@ public class Piece{
                 return checkIfEmptyInARow(i, j, board);
             }
         }
-        System.out.println("invalid move at steps: " + (i - currentI) + " , " + (j - currentJ));
+        System.out.println("invalid "+type+" move at steps: " + (i - currentI) + " , " + (j - currentJ));
+        return false;
+    }
+    public boolean knightValid(int i, int j, Piece[][] board){
+        if(Math.abs(i - currentI) == 1){ //sideways L, can move backwards
+            if(Math.abs(j - currentJ) == 2){
+                takePiece(i, j, board);
+                return true;
+            }
+        }
+        if(Math.abs(i - currentI) == 2){ //long L, can move backwards
+            if(Math.abs(j - currentJ) == 1){
+                takePiece(i, j, board);
+                return true;
+            }
+        }
+        System.out.println("invalid "+type+" move at steps: " + (i - currentI) + " , " + (j - currentJ));
         return false;
     }
 }
