@@ -22,4 +22,7 @@ public class Queen extends Piece  {
         }
         return false;
     }
+    public char toChar(){
+        return color==PieceColor.WHITE?'Q':'q';
+    }
 }

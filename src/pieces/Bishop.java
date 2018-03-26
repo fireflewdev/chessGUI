@@ -3,7 +3,6 @@ package pieces;
 import game.Board;
 
 public class Bishop extends Piece {
-
     public Bishop(PieceColor color, int currentI, int currentJ, Board board) {
         super(color, currentI, currentJ, board);
         loadImage(color==PieceColor.WHITE?"whitebishop":"blackbishop");
@@ -15,5 +14,8 @@ public class Bishop extends Piece {
             return true;
         }
         return false;
+    }
+    public char toChar(){
+        return color==PieceColor.WHITE?'B':'b';
     }
 }

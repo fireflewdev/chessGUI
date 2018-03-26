@@ -12,4 +12,7 @@ public class King extends Piece {
     public boolean isValidMove(int i, int j) {
         return Math.abs(i-currentI) <= 1 && Math.abs(j-currentJ) <= 1;
     }
+    public char toChar(){
+        return color==PieceColor.WHITE?'K':'k';
+    }
 }

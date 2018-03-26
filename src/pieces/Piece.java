@@ -35,6 +35,7 @@ public abstract class Piece {
         this.currentJ = currentJ;
         taken = '_'; //nothing taken
         factor = this.color == PieceColor.WHITE?-1:1; //blacks checking will be opposite of white so we make it negative
+        board.putPiece(currentI, currentJ, this);
 
     }
 
@@ -133,6 +134,8 @@ public abstract class Piece {
         return isValidMove(i, j);
     }
 
-    protected  abstract boolean isValidMove(int i, int j);
+    protected abstract boolean isValidMove(int i, int j);
+
+    public abstract char toChar();
 
 }

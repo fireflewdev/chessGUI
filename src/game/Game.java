@@ -1,5 +1,7 @@
 package game;
 
+import pieces.*;
+
 import java.awt.Image;
 import java.awt.*;
 import java.awt.event.*;
@@ -36,7 +38,8 @@ public class Game extends JPanel implements MouseListener {
     //constructor that manages the whole game
     public Game() {
         board = new Board();
-        System.out.println(this.toString());
+        setUpBoard();
+        System.out.println(toString());
         //edit frame config
         //frame.setSize(800, 800);
         frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -55,7 +58,41 @@ public class Game extends JPanel implements MouseListener {
         addMouseListener(this);
         redraw();
     }
+    public void setUpBoard(){
+        //init game array
+        //keep in mind that i is y and j is x. easy to get those confused
+        int j = 0;
+        new Rook(PieceColor.BLACK, 0, j++, board);
+        new Knight(PieceColor.BLACK, 0, j++, board);
+        new Bishop(PieceColor.BLACK, 0, j++, board);
+        new Queen(PieceColor.BLACK, 0, j++, board);
+        new King(PieceColor.BLACK, 0, j++, board);
+        new Bishop(PieceColor.BLACK, 0, j++, board);
+        new Knight(PieceColor.BLACK, 0, j++, board);
+        new Rook(PieceColor.BLACK, 0, j++, board);
 
+        for (j = 0; j < board.getSize(); j++) {
+            new Pawn(PieceColor.BLACK, 1, j, board); //_ = empty space
+        }
+        for (int i = 2; i < board.getSize() - 2; i++) {
+            for (j = 0; j < board.getSize(); j++) {
+                new Blank(PieceColor.BLANK, i, j, board); //_ = empty space
+            }
+        }
+        for (j = 0; j < board.getSize(); j++) {
+            new Pawn(PieceColor.WHITE, 6, j, board); //_ = empty space
+        }
+        j = 0;
+        new Rook(PieceColor.WHITE, 7, j++, board);
+        new Knight(PieceColor.WHITE, 7, j++, board);
+        new Bishop(PieceColor.WHITE, 7, j++, board);
+        new Queen(PieceColor.WHITE, 7, j++, board);
+        new King(PieceColor.WHITE, 7, j++, board);
+        new Bishop(PieceColor.WHITE, 7, j++, board);
+        new Knight(PieceColor.WHITE, 7, j++, board);
+        new Rook(PieceColor.WHITE, 7, j++, board);
+
+    }
     //what to do on click
     public void mouseClicked(MouseEvent e) {
         constraint = Math.min(frame.getWidth(), frame.getHeight()); //whichever side is the constraint
@@ -231,6 +268,6 @@ public class Game extends JPanel implements MouseListener {
     }
 
     public String toString() {
-        return "ha";
+        return board.toString() +"\n" +(whiteTurn?"White's turn":"Black's turn");
     }
 }

@@ -40,4 +40,7 @@ public class Pawn extends Piece {
         }
         return true;
     }
+    public char toChar(){
+        return color==PieceColor.WHITE?'P':'p';
+    }
 }

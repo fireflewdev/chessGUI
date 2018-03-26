@@ -18,4 +18,7 @@ public class Rook extends Piece {
         }
         return false;
     }
+    public char toChar(){
+        return color==PieceColor.WHITE?'R':'r';
+    }
 }

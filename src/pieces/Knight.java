@@ -24,4 +24,7 @@ public class Knight extends Piece {
         }
         return false;
     }
+    public char toChar(){
+        return color==PieceColor.WHITE?'N':'n';
+    }
 }

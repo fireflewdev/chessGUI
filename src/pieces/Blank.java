@@ -11,4 +11,7 @@ public class Blank extends Piece {
     public boolean isValidMove(int i, int j) {
         return false;
     }
+    public char toChar(){
+        return '-';
+    }
 }
