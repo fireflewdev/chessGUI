@@ -10,6 +10,16 @@ public class Queen extends Piece  {
 
     @Override
     public boolean isValidMove(int i, int j) {
+        if(currentI == i || currentJ == j) { //along same lines
+            if (checkIfEmptyInALine(currentI, currentJ, i, j)) {
+                if(!board.isEmpty(i, j)) takePiece(i, j);
+                return true;
+            }
+        }
+        if(checkIfEmptyInADiagonal(currentI, currentJ, i, j)){
+            if(!board.isEmpty(i, j)) takePiece(i, j);
+            return true;
+        }
         return false;
     }
 }

@@ -65,19 +65,16 @@ public abstract class Piece {
         }
         return true;
     }
-    public boolean checkIfEmptyInADiagonal(int fi, int fj, int li, int lj){ //for everyone else
-        if(Math.abs(fi-li) != Math.abs(fj-lj)) return false;
-        int smallI = Math.min(fi, li);
-        int largeI = Math.max(fi, li);
-        int smallJ = Math.min(fj, lj);
-        int largeJ = Math.max(fj, lj);
-        for (int i = smallI; i <= largeI; i++) {
-            for(int j = smallJ; j <= largeJ; j++) {
-                if (i != fi && i != li && j != fj && j != lj) {
-                    if (!board.isEmpty(i, j)) {
-                        return false;
-                    }
-                }
+    public boolean checkIfEmptyInADiagonal(int fi, int fj, int li, int lj) {
+        int steps = Math.abs(li-fi);
+        int signi = (int) Math.signum(li - fi);
+        int signj = (int) Math.signum(lj - fj);
+        if(steps != Math.abs(fj-lj)) {
+            return false;
+        }
+        for (int step = 1; step < steps; step++) {
+            if (!board.isEmpty(fi + signi*step, fj + signj*step)) {
+                return false;
             }
         }
         return true;
