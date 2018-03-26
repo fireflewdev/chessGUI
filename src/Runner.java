@@ -1,3 +1,5 @@
+import game.Game;
+
 /*
  * chess test game written by Fireflewdev and DJN1
  * http://www.fireflew.top/

@@ -1,5 +1,6 @@
+package game;
+
 import java.awt.Image;
-import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
@@ -19,7 +20,7 @@ public class Game extends JPanel implements MouseListener {
     private int constraint, offset, side, center, centerOffset; //offsets and stuff
     private int pI, pJ; //params for painting
     private BufferedImage paintImage;
-    private Piece[][] board; //le board
+    private Board board; //le board
     private JFrame frame = new JFrame(); //frame to put all the GUI on
     private File tempImg;
     private final Color BG = Color.decode("#31607d"); //color of background
@@ -31,32 +32,10 @@ public class Game extends JPanel implements MouseListener {
     private final Color TAKEWHITE = Color.decode("#97bfa7"); //color of a take-able white square
     private final Color TAKEBLACK = Color.decode("#599670"); //color of take-able black square
     private final String path = "res/";
-    private final int imageScale = Image.SCALE_DEFAULT;
-    public Image wking, bking, wknight, bknight, wbishop, bbishop, wqueen, bqueen, wrook, brook, wpawn, bpawn;
 
     //constructor that manages the whole game
     public Game() {
-        board = new Piece[8][8];
-        //init game array
-        //keep in mind that i is y and j is x. easy to get those confused
-        char[] pieces = {'r', 'h', 'b', 'k', 'q', 'b', 'h', 'r'}; //array of chars specifying board setup
-        for (int j = 0; j < board.length; j++) {
-            board[0][j] = new Piece(pieces[pieces.length - j - 1], 'b', 0, j); //_ = empty space
-        }
-        for (int j = 0; j < board.length; j++) {
-            board[1][j] = new Piece('p', 'b', 1, j); //_ = empty space
-        }
-        for (int i = 2; i < board.length - 2; i++) {
-            for (int j = 0; j < board.length; j++) {
-                board[i][j] = new Piece('_', '_', i, j); //_ = empty space
-            }
-        }
-        for (int j = 0; j < board.length; j++) {
-            board[6][j] = new Piece('p', 'w', 6, j); //_ = empty space
-        }
-        for (int j = 0; j < board.length; j++) {
-            board[7][j] = new Piece(pieces[j], 'w', 7, j); //_ = empty space
-        }
+        board = new Board();
         System.out.println(this.toString());
         //edit frame config
         //frame.setSize(800, 800);
@@ -73,22 +52,6 @@ public class Game extends JPanel implements MouseListener {
         center = Math.max(frame.getWidth(), frame.getHeight());
         centerOffset = (center - 8 * side) / 2;
         //load images:
-        try {
-            wking = ImageIO.read(new File(path + "whiteking.png"));
-            bking = ImageIO.read(new File(path + "blackking.png"));
-            wknight = ImageIO.read(new File(path + "whiteknight.png"));
-            bknight = ImageIO.read(new File(path + "blackknight.png"));
-            wbishop = ImageIO.read(new File(path + "whitebishop.png"));
-            bbishop = ImageIO.read(new File(path + "blackbishop.png"));
-            wqueen = ImageIO.read(new File(path + "whitequeen.png"));
-            bqueen = ImageIO.read(new File(path + "blackqueen.png"));
-            wrook = ImageIO.read(new File(path + "whiterook.png"));
-            brook = ImageIO.read(new File(path + "blackrook.png"));
-            wpawn = ImageIO.read(new File(path + "whitepawn.png"));
-            bpawn = ImageIO.read(new File(path + "blackpawn.png"));
-        } catch (IOException e) {
-            System.out.print("ERROR: a file is not found: ");
-        }
         addMouseListener(this);
         redraw();
     }
@@ -148,11 +111,7 @@ public class Game extends JPanel implements MouseListener {
 
             /*MOVING THE PIECES*/
 
-            Piece temp = board[firstI][firstJ];
-            //temp.move(secondI,secondJ,board);
-            board[firstI][firstJ] = new Piece('_', '_', firstI, firstJ);
-            board[secondI][secondJ] = temp;
-            //board = board[firstI][firstJ].getBoard();
+            board.getPiece(firstI, firstJ).move(secondI, secondJ);
             System.out.println("Second " + secondJ + "," + secondI);
             System.out.println(this.toString());
             firstJ = -1; //setting all this to 0 so that we'll know we're on first click again!
@@ -169,11 +128,11 @@ public class Game extends JPanel implements MouseListener {
         if (firstJ < 0 || firstJ > 7) { //is it within board range?
             return false;
         }
-        if (board[firstI][firstJ].getType() == '_') { //can't select an empty square!
+        if (board.isEmpty(firstI, firstJ)) { //can't select an empty square!
             System.out.println("can't select an empty square, silly-head!");
             return false;
         }
-        if (board[firstI][firstJ].getColor() == 'w' && !whiteTurn || board[firstI][firstJ].getColor() == 'b' && whiteTurn) { //can't select opposite color piece!
+        if (board.getPiece(firstI, firstJ).isWhite() && !whiteTurn || board.getPiece(firstI, firstJ).isBlack() && whiteTurn) { //can't select opposite color piece!
             System.out.println("can't select an opposite color piece, silly-head!");
             return false;
         }
@@ -187,23 +146,12 @@ public class Game extends JPanel implements MouseListener {
             return false;
         } else if (secondI == firstI && secondJ == firstJ) { //is the destination on the same tile as the starting point we selected?
             return false;
-        } else if (!board[firstI][firstJ].move(secondI, secondJ, board)) { //check if it is a valid move according to specific piece's requirements.
+        } else if (!board.getPiece(firstI, firstJ).canMove(secondI, secondJ)) { //check if it is a valid move according to specific piece's requirements.
             return false;
         }
         return true;
     }
 
-    //renders piece
-    public void paintPiece(Graphics g, Image image, int i, int j){
-        constraint = Math.min(frame.getWidth(), frame.getHeight()); //whichever side is the constraint
-        offset = constraint / 10; // divided by 10 because there are 10 slots: offset, 8 tiles, another offset
-        side = constraint / 10; //side of a tile
-        center = Math.max(frame.getWidth(), frame.getHeight());
-        centerOffset = (center - 8 * side) / 2;
-        if (frame.getWidth() > frame.getHeight()) //constraint image
-            g.drawImage(image, j * side + centerOffset, i * side + offset, side, side,null);
-        else g.drawImage(image, j * side + offset, i * side + centerOffset, side, side, null);
-    }
     //renders board
     public void paint(Graphics g) {
         constraint = Math.min(frame.getWidth(), frame.getHeight()); //whichever side is the constraint
@@ -217,7 +165,7 @@ public class Game extends JPanel implements MouseListener {
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 //draw pattern
-                if(firstI == -1 || board[firstI][firstJ].checkIfValidMove(i,j, board) == false) {
+                if(firstI == -1 || !board.getPiece(firstI,firstJ).canMove(i,j)) {
                     if ((j + i) % 2 == 1) {
                         g.setColor(WHITE);
                         if (frame.getWidth() > frame.getHeight())
@@ -232,13 +180,13 @@ public class Game extends JPanel implements MouseListener {
                     }
                 } else {
                     if ((j + i) % 2 == 1) {
-                        g.setColor(board[i][j].getType()!='_'?TAKEWHITE:VALIDWHITE); //set color to TAKEWHITE if takeable and VALIDWHITE if valid
+                        g.setColor(!board.isEmpty(i,j)?TAKEWHITE:VALIDWHITE); //set color to TAKEWHITE if takeable and VALIDWHITE if valid
                         if (frame.getWidth() > frame.getHeight())
                             g.fillRect(j * side + centerOffset, i * side + offset, side, side);
                         else g.fillRect(j * side + offset, i * side + centerOffset, side, side);
 
                     } else {
-                        g.setColor(board[i][j].getType()!='_'?TAKEBLACK:VALIDBLACK);
+                        g.setColor(!board.isEmpty(i,j)?TAKEBLACK:VALIDBLACK);
                         if (frame.getWidth() > frame.getHeight())
                             g.fillRect(j * side + centerOffset, i * side + offset, side, side);
                         else g.fillRect(j * side + offset, i * side + centerOffset, side, side);
@@ -253,45 +201,7 @@ public class Game extends JPanel implements MouseListener {
                     }
                 }
                 //draw piece
-                char type = board[i][j].getType();
-                if (type == 'k') {
-                    if (board[i][j].getColor() == 'w') {
-                        paintPiece(g, wking, i, j);
-                    } else {
-                        paintPiece(g, bking, i, j);
-                    }
-                } else if (type == 'h') {
-                    if (board[i][j].getColor() == 'w') {
-                        paintPiece(g, wknight, i, j);
-                    } else {
-                        paintPiece(g, bknight, i, j);
-                    }
-                } else if (type == 'b') {
-                    if (board[i][j].getColor() == 'w') {
-                        paintPiece(g, wbishop, i, j);
-                    } else {
-                        paintPiece(g, bbishop, i, j);
-                    }
-                } else if (type == 'q') {
-                    if (board[i][j].getColor() == 'w') {
-                        paintPiece(g, wqueen, i, j);
-                    } else {
-                        paintPiece(g, bqueen, i, j);
-                    }
-                } else if (type == 'r') {
-                    if (board[i][j].getColor() == 'w') {
-                        paintPiece(g, wrook, i, j);
-                    } else {
-                        paintPiece(g, brook, i, j);
-                    }
-                } else if (type == 'p') {
-                    if (board[i][j].getColor() == 'w') {
-                        paintPiece(g, wpawn, i, j);
-                    } else {
-                        paintPiece(g, bpawn, i, j);
-                    }
-                }
-
+                board.getPiece(i, j).paintPiece(frame, g);
             }
         }
     }
@@ -321,14 +231,6 @@ public class Game extends JPanel implements MouseListener {
     }
 
     public String toString() {
-        String out = "";
-        for (int i = 0; i < board.length; i++) {
-            for (int j = 0; j < board.length; j++) {
-                if (board[i][j].getColor() != 'b') out += board[i][j].getType() + " ";
-                else out += (char) (board[i][j].getType() - 32) + " ";
-            }
-            out += "\n";
-        }
-        return out;
+        return "ha";
     }
 }
