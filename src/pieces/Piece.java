@@ -7,6 +7,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 
 /*
   * different types of pieces
@@ -119,8 +120,10 @@ public abstract class Piece {
     }
 
     protected void loadImage(String name){
+        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+        InputStream is = classLoader.getResourceAsStream(name + ".png");
         try {
-            image = ImageIO.read(new File("res/"+name+".png"));
+            image = ImageIO.read(is);
         } catch (IOException e) {
             System.out.println("cannot load "+name);
             e.printStackTrace();
